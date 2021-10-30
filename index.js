@@ -37,17 +37,10 @@ async function run() {
 
         // GET API for show data
         app.get('/services', async (req, res) => {
-            const cursor = foodCollection.find({});
+            const cursor = foodCollection.find({}).limit(6);
             const services = await cursor.toArray();
             res.send(services);
         });
-        // my orders services
-        // app.get("/myOrders/:email", async (req, res) => {
-        //     const result = await EventsCollection.find({
-        //       email: req.params.email,
-        //     }).toArray();
-        //     res.send(result);
-        //   });
 
         // GET Single Service id
         app.get('/services/:id', async (req, res) => {
@@ -78,14 +71,45 @@ async function run() {
             console.log('deleting user with id ', result);
             res.json(result);
           })
-          // show my orders
-            app.get("/myorders/:email", async (req, res) => {
-                const result = await EventsCollection.find({
-                email: req.params.email,
-                }).toArray();
-                res.send(result);
-            });
-
+        // show my orders
+        app.get("/myorders/:email", async (req, res) => {
+            const result = await ordersCollection.find({
+            email: req.params.email,
+            }).toArray();
+            res.send(result);
+        });
+        // cancel an order
+        app.delete('/myorders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            console.log('deleting user with id ', result);
+            res.json(result);
+          })
+            // dynamic api for update products
+            app.get('/orders/:id', async (req, res) => {
+                const id = req.params.id;
+                const query = { _id: ObjectId(id) };
+                const order = await ordersCollection.findOne(query);
+                console.log('load user with id: ', id);
+                res.send(order);
+            })
+            
+        // update status
+        app.put('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedOrder = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+            $set: {
+                status: updatedOrder.status,
+            },
+        };
+        const result = await ordersCollection.updateOne(filter, updateDoc, options)
+        console.log('updating', id)
+        res.json(result)
+        })
 
     }finally{
         // await client.close();
