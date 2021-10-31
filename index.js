@@ -26,7 +26,7 @@ async function run() {
        .db("delivery-service")
        .collection("orders");
         
-       //post api for services insert
+       //post api for food menu service insert
         app.post('/services', async (req, res) => {
             const service = req.body;
             console.log('hit the post api', service);
@@ -42,7 +42,7 @@ async function run() {
             res.send(services);
         });
 
-        // GET Single Service id
+        // GET Single Food menu service id
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             console.log('getting specific service', id);
